@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kautilya's Royal Scrolls</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:Georgia,serif;color:#ffe9bd;background:radial-gradient(circle at 50% 0,#633b1d,#210f08 48%,#080403)}
+.wrap{max-width:1080px;margin:auto;padding:14px}.panel{background:linear-gradient(145deg,#3a2012,#160b07);border:2px solid #a87536;border-radius:24px;padding:18px;box-shadow:0 18px 65px #000}
+h1{text-align:center;color:#e9b85b;font-size:clamp(32px,7vw,58px);margin:4px;text-shadow:0 3px 15px #000}
+.sub{text-align:center;color:#c8aa7c;margin-bottom:16px}.stats{display:flex;justify-content:center;flex-wrap:wrap;gap:9px}.stat{padding:9px 14px;background:#1b0e08;border:1px solid #704b27;border-radius:12px}
+.story{max-width:880px;margin:17px auto;padding:17px;background:#1b0f09;border:1px solid #704a27;border-radius:16px;line-height:1.55}.story .chapter{color:#e9b85b;font-weight:bold}.story .source{color:#c8aa7c;font-size:13px}
+.progress{height:8px;max-width:880px;margin:10px auto 15px;background:#100705;border-radius:9px;overflow:hidden}.fill{height:100%;background:#e9b85b;transition:.3s}
+.instruction{text-align:center;color:#c8aa7c;font-size:14px}
+.scrollbox{display:flex;justify-content:center;margin:13px}.scroll{width:min(680px,100%);min-height:145px;padding:25px;background:linear-gradient(135deg,#f0d49a,#c49a57);color:#2a1709;border:4px solid #805827;border-radius:9px;box-shadow:0 12px 35px #0009;cursor:grab}
+.scroll h2{text-align:center;margin:0 0 10px;font-size:24px}.scroll p{text-align:center;font-size:18px;line-height:1.45;margin:0}
+.bins{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:920px;margin:16px auto}.bin{min-height:145px;padding:14px;text-align:center;border-radius:18px;background:#140a07;border:2px dashed #75502d;cursor:pointer;transition:.2s}.bin:hover{transform:translateY(-3px)}.bin h3{margin:5px;font-size:20px}.bin p{font-size:13px;color:#bda176;margin:5px}.safe{border-color:#4d8954}.review{border-color:#a07a2d}.risk{border-color:#a44d3b}.active{box-shadow:0 0 24px #e9b85b66;transform:scale(1.03)}
+.feedback{max-width:820px;margin:14px auto;padding:14px;border-radius:12px;background:#1b0e08;line-height:1.5;text-align:center}.good{border:1px solid #5b9a62}.bad{border:1px solid #a84e3e}
+.connection{margin-top:10px;padding:11px;background:#24130b;border-left:4px solid #e9b85b;text-align:left;font-size:14px}
+button{display:block;margin:15px auto;padding:12px 24px;border-radius:12px;border:1px solid #b7833d;background:#65371e;color:#fff0cf;font:inherit;cursor:pointer}.primary{background:linear-gradient(135deg,#b66c29,#70401e);font-weight:bold}
+.hidden{display:none}.end{text-align:center;padding:28px}.crown{font-size:65px}.rank{font-size:clamp(28px,6vw,48px);color:#e9b85b}
+@media(max-width:650px){.bins{grid-template-columns:1fr}.bin{min-height:100px}}
+</style>
+</head>
+<body>
+<div class="wrap"><div class="panel">
+
+<div id="game">
+<h1>☼ Kautilya's Royal Scrolls ☼</h1>
+<div class="sub">Arthashastra • Book II • The Duties of Government Superintendents</div>
+
+<div class="stats">
+<div class="stat">📜 Scroll <b id="count">1</b>/12</div>
+<div class="stat">⭐ Score <b id="score">0</b></div>
+<div class="stat">🔥 Streak <b id="streak">0</b></div>
+</div>
+
+<div class="story" id="story"></div>
+<div class="progress"><div class="fill" id="fill"></div></div>
+<div class="instruction">Read the royal situation. Then sort Kautilya's scroll into the chamber that best fits the Arthashastra principle.</div>
+
+<div class="scrollbox"><div class="scroll" id="scroll" draggable="true"></div></div>
+
+<div class="bins">
+<div class="bin safe" data-cat="safe"><h3>🟢 PROPER PRACTICE</h3><p>The action agrees with the principle described in the Arthashastra.</p></div>
+<div class="bin review" data-cat="review"><h3>🟡 EXAMINE FURTHER</h3><p>The situation calls for checking, scrutiny or further evidence.</p></div>
+<div class="bin risk" data-cat="risk"><h3>🔴 BREACH</h3><p>The scroll describes conduct that conflicts with Kautilya's rules or threatens state revenue.</p></div>
+</div>
+
+<div id="feedback"></div>
+</div>
+
+<div id="end" class="end hidden"></div>
+</div></div>
+
+<script>
+const cases=[
+{
+ch:"Book II, Chapter 7 — Keeping Accounts",
+story:"The superintendent of accounts receives sealed books, commodities and net revenue from district accountants. He hears their totals of receipts, expenditure and net revenue before accepting the net amount.",
+scroll:"The accounts are received with the sealed books and net revenue, and the totals are checked before the amount is accepted.",
+cat:"safe",
+ex:"PROPER PRACTICE — Kautilya describes receiving the accounts and hearing the totals of receipts, expenditure and net revenue before the net amount is received.",
+},
+{
+ch:"Book II, Chapter 7 — Keeping Accounts",
+story:"A clerk prepares the daily account. Another officer checks it using addition, subtraction, inference and comparison with prescribed forms and precedents.",
+scroll:"The daily account is checked using prescribed forms and arithmetic before it is accepted.",
+cat:"safe",
+ex:"PROPER PRACTICE — Chapter 7 says the daily accounts are to be checked with reference to prescribed forms, precedents and arithmetic.",
+},
+{
+ch:"Book II, Chapter 7 — Keeping Accounts",
+story:"A clerk wants to make the accounts look correct. He enters the same transaction twice so that the figures will match another register.",
+scroll:"A clerk makes a double entry for the same transaction.",
+cat:"risk",
+ex:"BREACH — Chapter 7 specifically treats double or treble entries as an offence subject to punishment.",
+},
+{
+ch:"Book II, Chapter 7 — Keeping Accounts",
+story:"A revenue entry was omitted from the account book. The clerk later adds it and says that he simply remembered it after the account had already been submitted.",
+scroll:"A missing entry is added later and presented as if it had only been forgotten.",
+cat:"risk",
+ex:"BREACH — Chapter 7 specifically addresses entries that are omitted and later added as though forgotten, with additional punishment.",
+},
+{
+ch:"Book II, Chapter 8 — Detection of Embezzlement",
+story:"The treasury has lost revenue. Kautilya's officers are examining whether the loss came from obstruction, fabrication of accounts, loss of revenue, self-enjoyment, barter or defalcation.",
+scroll:"The officers investigate the possible causes of depletion of the treasury instead of assuming the cause.",
+cat:"safe",
+ex:"PROPER PRACTICE — Chapter 8 identifies several causes of treasury depletion and focuses on detecting what has been embezzled.",
+},
+{
+ch:"Book II, Chapter 8 — Detection of Embezzlement",
+story:"A government servant is accused of taking part of a large sum. The evidence proves that he misappropriated part of that amount.",
+scroll:"The proven misappropriation is treated as a matter requiring accountability for the larger amount involved.",
+cat:"risk",
+ex:"BREACH — Chapter 8 states that when a government servant is proved to have misappropriated part of a large sum, he is answerable for the whole.",
+},
+{
+ch:"Book II, Chapter 9 — Examination of Government Servants",
+story:"The chief officer reviews a department's actual work, receipts and expenditure in detail and in total before judging the superintendent's performance.",
+scroll:"The department's actual work, receipts and expenditure are scrutinised before the superintendent is judged.",
+cat:"safe",
+ex:"PROPER PRACTICE — Chapter 9 calls for thorough scrutiny of the real amount of work done, receipts realised and expenditure incurred.",
+},
+{
+ch:"Book II, Chapter 9 — Examination of Government Servants",
+story:"A superintendent reports that a department spent heavily but provides no evidence showing what work was actually completed or what receipts were realised.",
+scroll:"The reported expenditure is accepted without checking the actual work and receipts.",
+cat:"review",
+ex:"EXAMINE FURTHER — Chapter 9 says the chief officer should scrutinise actual work, receipts and expenditure. The evidence is incomplete.",
+},
+{
+ch:"Book II, Chapter 15 — Superintendent of Store-house",
+story:"The storehouse superintendent records incoming goods and keeps the royal stores organised so that the king's property can be accounted for.",
+scroll:"The storehouse records incoming goods and maintains organised records of the king's stores.",
+cat:"safe",
+ex:"PROPER PRACTICE — Book II includes a dedicated chapter on the Superintendent of the Store-house and the management of state stores.",
+},
+{
+ch:"Book II, Chapter 11 — Gems Entered into the Treasury",
+story:"A valuable gem arrives at the treasury. The superintendent examines it before it is accepted and recorded as treasury property.",
+scroll:"A valuable item is examined before being entered into the royal treasury.",
+cat:"safe",
+ex:"PROPER PRACTICE — Chapter 11 is specifically devoted to examination of gems that are to be entered into the treasury.",
+},
+{
+ch:"Book II, Chapter 19 — Weights and Measures",
+story:"A merchant delivers valuable goods. The official uses the prescribed weights rather than accepting the merchant's stated quantity.",
+scroll:"The goods are checked using the prescribed weights and measures.",
+cat:"safe",
+ex:"PROPER PRACTICE — Book II contains a chapter specifically on the Superintendent of Weights and Measures, supporting controlled measurement of goods.",
+},
+{
+ch:"Book II, Chapter 9 — Examination of Government Servants",
+story:"A government servant's revenue figures have fallen sharply. The chief officer does not immediately accuse him. Instead, he orders the work, expenditure and receipts to be examined and seeks evidence.",
+scroll:"The officer investigates the fall in revenue before reaching a conclusion.",
+cat:"review",
+ex:"EXAMINE FURTHER — Chapter 9 stresses examination of officials and their work, receipts and expenditure. The right response is scrutiny before conclusion.",
+}
+];
+
+let i=0,score=0,streak=0,locked=false;
+const $=x=>document.getElementById(x);
+
+function show(){
+ const c=cases[i];
+ $("count").textContent=i+1;
+ $("score").textContent=score;
+ $("streak").textContent=streak;
+ $("fill").style.width=(i/cases.length*100)+"%";
+ $("story").innerHTML='<div class="chapter">'+c.ch+'</div><div style="margin-top:7px">'+c.story+'</div><div class="source">This round is built from the cited Book/Chapter principle.</div>';
+ $("scroll").innerHTML='<h2>📜 Royal Scroll</h2><p>'+c.scroll+'</p>';
+ $("feedback").innerHTML="";
+ $("feedback").className="";
+ $("scroll").draggable=true;
+ locked=false;
+}
+
+function label(c){return c==="safe"?"🟢 PROPER PRACTICE":c==="review"?"🟡 EXAMINE FURTHER":"🔴 BREACH"}
+
+function sort(cat){
+ if(locked)return;
+ locked=true;
+ const c=cases[i];
+ if(cat===c.cat){
+   let pts=100+streak*25;score+=pts;streak++;
+   $("feedback").className="feedback good";
+   $("feedback").innerHTML='✅ <b>Correct!</b><div class="connection">'+c.ex+'</div><br><b style="color:#e9b85b">+'+pts+' points</b>';
+ }else{
+   streak=0;score=Math.max(0,score-25);
+   $("feedback").className="feedback bad";
+   $("feedback").innerHTML='❌ <b>Not this chamber.</b><div class="connection">The scroll belongs in <b>'+label(c.cat)+'</b>.<br>'+c.ex+'</div>';
+ }
+ $("score").textContent=score;$("streak").textContent=streak;$("scroll").draggable=false;
+ setTimeout(()=>{i++;if(i<cases.length)show();else finish()},1900);
+}
+
+document.querySelectorAll(".bin").forEach(b=>{
+ b.addEventListener("click",()=>sort(b.dataset.cat));
+ b.addEventListener("dragover",e=>{e.preventDefault();b.classList.add("active")});
+ b.addEventListener("dragleave",()=>b.classList.remove("active"));
+ b.addEventListener("drop",e=>{e.preventDefault();b.classList.remove("active");sort(b.dataset.cat)});
+});
+$("scroll").addEventListener("dragstart",e=>e.dataTransfer.setData("text","scroll"));
+
+function finish(){
+ $("game").classList.add("hidden");$("end").classList.remove("hidden");
+ let rank=score>=1150?"👑 CHIEF ROYAL AUDITOR":score>=900?"🏆 MASTER OF THE ACCOUNTS":score>=650?"⚔️ TRUSTED ROYAL SUPERINTENDENT":"📜 ROYAL AUDIT APPRENTICE";
+ $("end").innerHTML='<div class="crown">👑</div><div class="rank">'+rank+'</div><p>You completed all 12 Arthashastra scrolls.</p><p>⭐ Final Score: <b>'+score+'</b></p><p><b>Your connection to Arthashastra:</b><br>You applied principles from Book II concerning accounts, treasury protection, embezzlement, examination of government servants, stores, gems, and weights and measures.</p><button class="primary" onclick="location.reload()">🔄 Play Again</button>';
+}
+show();
+</script>
+</body>
+</html>
